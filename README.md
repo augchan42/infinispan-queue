@@ -13,6 +13,8 @@ Since Infinispan supports transactions, transactions are used for input/output o
 * Infinispan Queue Slide
 http://www.slideshare.net/opennaru/20130226-infinispan-queue
 
-* Source Github 
+* Forked from Original Source 
 https://github.com/nameislocus/infinispan-queue/
 
+* Updates to support Pessimistic Locking with Infinispan 12
+https://github.com/hosermage42/infinispan-queue
