@@ -40,22 +40,24 @@ public class InfinispanQueueTest {
 		System.setProperty("jgroups.udp.mcast_port", "46655");
 
 		EmbeddedCacheManager manager = new DefaultCacheManager(
-				"infinispan-distribution.xml");
-		Cache<String, Object> cache = manager.getCache("testCache");
+				"infinispanConfig.xml");
+		Cache<String, Object> cache = manager.getCache("INFINISPAN_QUEUE");
+		cache.start();
 
 		InfinispanQueue queue = new InfinispanQueue();
 
-		queue.initialize(cache);
+		queue.initialize(cache, "C_PARTY");
  
 		queue.printInfo(cache);
 
 		// 1000개 Offer
 		long start = System.currentTimeMillis();
 		for( int i = 0; i < 1000; i++ ) {
-			queue.offer(cache, new InfinispanQueueElement("ABCDEF" + i));
+			String message = "ABCDEF" + i;
+			queue.offer(cache, new InfinispanQueueElement(message));
 		}
 		long end = System.currentTimeMillis();
-		System.out.println("queue offer 1000 time=" + (end - start) );
+		System.out.println("queue offer 1000 time=" + (end - start) + " ms.");
 
 		queue.printInfo(cache);
 
@@ -63,7 +65,7 @@ public class InfinispanQueueTest {
 		start = System.currentTimeMillis();
 		queue.offer(cache, new InfinispanQueueElement("123456"));
 		end = System.currentTimeMillis();
-		System.out.println("queue offer 1 time=" + (end - start) );
+		System.out.println("queue offer 1 time=" + (end - start) + " ms.");
 		
 		// 1000개 Poll
 		start = System.currentTimeMillis();
@@ -72,14 +74,17 @@ public class InfinispanQueueTest {
 			//System.out.println(queue.poll(cache));
 		}
 		end = System.currentTimeMillis();
-		System.out.println("queue poll 1000 time=" + (end - start) );
+		System.out.println("queue poll 1000 time=" + (end - start) + " ms.");
 		
 		// 1개 Poll
-		System.out.println(queue.poll(cache));
+		System.out.println("Poll last element:" + queue.poll(cache));
 		// 1개 Poll == null
-		System.out.println(queue.poll(cache));
+		System.out.println("Should be no more elements here: " + queue.poll(cache));
 
 		queue.printInfo(cache);
+
+		cache.shutdown();
+		manager.close();
 
 	}
 }
